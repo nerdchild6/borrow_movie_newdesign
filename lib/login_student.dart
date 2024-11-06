@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:borrow_movie/admin/Ad_main_screen.dart';
 import 'package:borrow_movie/approver/app_main_screen.dart';
 import 'package:borrow_movie/main.dart';
 import 'package:borrow_movie/student/main_screen.dart';
 import 'package:borrow_movie/student/regis_student.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,57 +16,90 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController _username = TextEditingController();
-  TextEditingController _password = TextEditingController();
+  final String url = '172.25.199.86:3000';
+  bool isWaiting = false;
+  final tcUsername = TextEditingController();
+  final tcPassword = TextEditingController();
 
-  Future<void> _loginUser() async {
-    final response = await http.post(
-      Uri.parse('http://172.27.111.44:3000/login'), // Replace with your actual API URL
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'username': _username.text,
-        'password': _password.text,
-      }),
-    );
+  void popDialog(String title, String message) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+          );
+        });
+  }
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = jsonDecode(response.body);
-      final String role = data['role'];
-
-      if (role == "student") {
-        // Student role
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()), // User screen
-          (Route<dynamic> route) => false,
-        );
-      } else if (role == "admin") {
-        // Admin role
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => AdMainScreen()), // Admin screen
-          (Route<dynamic> route) => false,
-        );
-      } else if (role == "approver") {
-        // Approver role
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => AppMainScreen()), // Approver screen
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        // Unrecognized role
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unrecognized user role')),
-        );
-      }
-    } else {
-      // Login failed
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid username or password')),
+  void login() async {
+    setState(() {
+      isWaiting = true;
+    });
+    try {
+      Uri uri = Uri.http(url, '/login');
+      Map account = {
+        'username': tcUsername.text.trim(),
+        'password': tcPassword.text.trim()
+      };
+      http.Response response = await http.post(
+        uri,
+        body: jsonEncode(account),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(
+        const Duration(seconds: 10),
       );
+      // check server's response
+      if (response.statusCode == 200) {
+        String token = response.body;
+        // get JWT token and save to local storage
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', token);
+        // decode JWT to get uername and role
+        final jwt = JWT.decode(token);
+        Map payload = jwt.payload;
+        // print(payload);
+
+
+        // navigate to admin page or user page
+        if (payload['role'] == 'admin') {
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => AdMainScreen()),
+          );
+        } else if (payload['role'] == 'student') {
+          // navigate to expense page
+          // check mounted to use 'context' for navigation in 'async' method
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => MainScreen()),
+          );
+        } else if(payload['role'] == 'approver'){
+          if (!mounted) return;
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => AppMainScreen()),
+          );
+        }
+      } else {
+        // wrong username or password
+        popDialog('Error', response.body);
+      }
+    } on TimeoutException catch (e) {
+      debugPrint(e.message);
+      popDialog('Error', 'Timeout error, try again!');
+    } catch (e) {
+      debugPrint(e.toString());
+      popDialog('Error', 'Unknown error, try again!');
+    } finally {
+      setState(() {
+        isWaiting = false;
+      });
     }
   }
 
@@ -115,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    controller: _username,
+                    controller: tcUsername,
                   ),
                   SizedBox(height: 10),
                   TextField(
@@ -130,12 +166,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       filled: true,
                       fillColor: Colors.white,
                     ),
-                    controller: _password,
+                    controller: tcPassword,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
                     child: Text('LOGIN' , style: TextStyle(color: Colors.white),),
-                    onPressed: _loginUser,
+                    onPressed: login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
