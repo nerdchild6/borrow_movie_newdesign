@@ -1,6 +1,7 @@
 import 'package:borrow_movie/login_student.dart';
 import 'package:borrow_movie/student/borrow_details_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BorrowScreen extends StatefulWidget {
   @override
@@ -45,6 +46,44 @@ class _BorrowScreenState extends State<BorrowScreen> {
     'Thriller',
     'War',
   ];
+
+  void confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sure to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: logout,
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void logout() async {
+    // remove stored token
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    // await prefs.remove('token');
+
+
+    // to prevent warning of using context in async function
+    if (!mounted) return;
+    // Cannot use only pushReplacement() because the dialog is showing
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (route) => false,
+    );
+  }
 
   @override
   void initState() {
@@ -94,14 +133,7 @@ class _BorrowScreenState extends State<BorrowScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Center(
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // Simulate successful login and navigate to HomeScreen
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                    (Route<dynamic> route) => false, // Remove all previous routes
-                  );
-                },
+                onPressed: confirmLogout,
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text('Logout', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(

@@ -1,8 +1,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:borrow_movie/login_student.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class AdHistoryScreen extends StatelessWidget {
+class AdHistoryScreen extends StatefulWidget {
+  @override
+  State<AdHistoryScreen> createState() => _AdHistoryScreenState();
+}
+
+class _AdHistoryScreenState extends State<AdHistoryScreen> {
   final List<Map<String, String>> historyData = [
     {
       'title': 'Harry Potter',
@@ -46,6 +52,44 @@ class AdHistoryScreen extends StatelessWidget {
     },
   ];
 
+  void confirmLogout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sure to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: logout,
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void logout() async {
+    // remove stored token
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    // await prefs.remove('token');
+
+
+    // to prevent warning of using context in async function
+    if (!mounted) return;
+    // Cannot use only pushReplacement() because the dialog is showing
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+      (route) => false,
+    );
+  }
+
   // Method to create a drawer
   Widget createDrawer(BuildContext context) {
     return Drawer(
@@ -76,13 +120,7 @@ class AdHistoryScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Center(
               child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                    (Route<dynamic> route) => false,
-                  );
-                },
+                onPressed: confirmLogout,
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text('Logout', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
