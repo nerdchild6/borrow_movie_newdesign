@@ -26,7 +26,7 @@ class _AdReturnScreenState extends State<AdReturnScreen> {
   ];
 
   // Current selected index in the list (if any)
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   // Method to show a pop-up with return details
   void _showPopup(

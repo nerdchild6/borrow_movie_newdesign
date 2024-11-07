@@ -2,6 +2,8 @@ import 'package:borrow_movie/student/status_screen.dart';
 import 'package:flutter/material.dart';
 
 class BorrowDetailsScreen extends StatelessWidget {
+  const BorrowDetailsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Fetching data passed through route arguments
@@ -9,13 +11,13 @@ class BorrowDetailsScreen extends StatelessWidget {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     // Setting up borrow and return dates
-    final DateTime _today = DateTime.now();
-    final DateTime _returnDate = _today.add(const Duration(days: 7));
+    final DateTime today = DateTime.now();
+    final DateTime returnDate = today.add(const Duration(days: 7));
 
     // Formatting return date
-    final int _returnDay = _returnDate.day;
-    final int _returnMonth = _returnDate.month;
-    final int _returnYear = _returnDate.year;
+    final int returnDay = returnDate.day;
+    final int returnMonth = returnDate.month;
+    final int returnYear = returnDate.year;
 
     return Scaffold(
       appBar: AppBar(
@@ -51,7 +53,7 @@ class BorrowDetailsScreen extends StatelessWidget {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
                         blurRadius: 8,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -76,12 +78,12 @@ class BorrowDetailsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Borrow Date : ${_today.day}/${_today.month}/${_today.year}',
+                        'Borrow Date : ${today.day}/${today.month}/${today.year}',
                         style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Return Date : $_returnDay/$_returnMonth/$_returnYear',
+                        'Return Date : $returnDay/$returnMonth/$returnYear',
                         style: const TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 24),
@@ -107,8 +109,8 @@ class BorrowDetailsScreen extends StatelessWidget {
                                   settings: RouteSettings(
                                     arguments: <String, dynamic>{
                                       'mo_name': data['name'],
-                                      'borrow_date': '${_today.day}/${_today.month}/${_today.year}',
-                                      'return_date': '$_returnDay/$_returnMonth/$_returnYear',
+                                      'borrow_date': '${today.day}/${today.month}/${today.year}',
+                                      'return_date': '$returnDay/$returnMonth/$returnYear',
                                       'bor_name': 'John', // Change to dynamic if necessary
                                       'status': 'Pending',
                                     },

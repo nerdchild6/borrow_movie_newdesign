@@ -27,7 +27,7 @@ class _RegisStudentState extends State<RegisStudent> {
   Future<void> _registerUser() async {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Passwords do not match')),
+        const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
@@ -49,7 +49,7 @@ class _RegisStudentState extends State<RegisStudent> {
     if (response.statusCode == 201) {
       // Registration successful
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User registered successfully')),
+        const SnackBar(content: Text('User registered successfully')),
       );
       Navigator.pushReplacement(
         context,
@@ -75,8 +75,8 @@ class _RegisStudentState extends State<RegisStudent> {
           ),
           Center(
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              padding: EdgeInsets.all(20),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.9),
                 borderRadius: BorderRadius.circular(20),
@@ -84,7 +84,7 @@ class _RegisStudentState extends State<RegisStudent> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     'Create a new account',
                     style: TextStyle(
                       fontSize: 24,
@@ -92,7 +92,7 @@ class _RegisStudentState extends State<RegisStudent> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
                     'Already registered?',
                     style: TextStyle(
@@ -116,12 +116,12 @@ class _RegisStudentState extends State<RegisStudent> {
                       );
                     },
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
                       hintText: 'Name',
-                      contentPadding: EdgeInsets.only(left: 20),
+                      contentPadding: const EdgeInsets.only(left: 20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -129,12 +129,12 @@ class _RegisStudentState extends State<RegisStudent> {
                       fillColor: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: _usernameController,
                     decoration: InputDecoration(
                       hintText: 'Username',
-                      contentPadding: EdgeInsets.only(left: 20),
+                      contentPadding: const EdgeInsets.only(left: 20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -142,12 +142,12 @@ class _RegisStudentState extends State<RegisStudent> {
                       fillColor: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       hintText: 'Email',
-                      contentPadding: EdgeInsets.only(left: 20),
+                      contentPadding: const EdgeInsets.only(left: 20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -155,7 +155,7 @@ class _RegisStudentState extends State<RegisStudent> {
                       fillColor: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: _passwordController,
                     obscureText: _obscureText,
@@ -167,7 +167,7 @@ class _RegisStudentState extends State<RegisStudent> {
                         ),
                         onPressed: _togglePasswordVisibility,
                       ),
-                      contentPadding: EdgeInsets.only(left: 20),
+                      contentPadding: const EdgeInsets.only(left: 20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -175,7 +175,7 @@ class _RegisStudentState extends State<RegisStudent> {
                       fillColor: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureText,
@@ -187,7 +187,7 @@ class _RegisStudentState extends State<RegisStudent> {
                         ),
                         onPressed: _togglePasswordVisibility,
                       ),
-                      contentPadding: EdgeInsets.only(left: 20),
+                      contentPadding: const EdgeInsets.only(left: 20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -195,19 +195,19 @@ class _RegisStudentState extends State<RegisStudent> {
                       fillColor: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
-                    child: Text('REGISTER', style: TextStyle(color: Colors.white),),
                     onPressed: _registerUser,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      minimumSize: Size(double.infinity, 50),
+                      minimumSize: const Size(double.infinity, 50),
                     ),
+                    child: Text('REGISTER', style: TextStyle(color: Colors.white),),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

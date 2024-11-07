@@ -68,7 +68,7 @@ class _AppRequestScreenState extends State<AppRequestScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          backgroundColor: Color.fromARGB(255, 227, 226, 225),
+          backgroundColor: const Color.fromARGB(255, 227, 226, 225),
           contentPadding: const EdgeInsets.all(15),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -289,7 +289,7 @@ class _AppRequestScreenState extends State<AppRequestScreen> {
           ),
         ),
         child: requests.isEmpty
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : ListView.builder(
                 itemCount: requests.length,
                 padding: const EdgeInsets.all(16.0),

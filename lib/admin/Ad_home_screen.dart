@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdHomeScreen extends StatefulWidget {
+  const AdHomeScreen({super.key});
+
   @override
   State<AdHomeScreen> createState() => _AdHomeScreenState();
 }

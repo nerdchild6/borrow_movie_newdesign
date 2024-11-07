@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BorrowScreen extends StatefulWidget {
+  const BorrowScreen({super.key});
+
   @override
   State<BorrowScreen> createState() => _BorrowScreenState();
 }
@@ -210,8 +212,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
         category = newValue!;
       });
     },
-    dropdownColor: Color.fromARGB(255, 235, 234, 233), // Set your desired dropdown background color here
-    iconEnabledColor: Color.fromARGB(255, 0, 0, 0), // Change icon color if needed
+    dropdownColor: const Color.fromARGB(255, 235, 234, 233), // Set your desired dropdown background color here
+    iconEnabledColor: const Color.fromARGB(255, 0, 0, 0), // Change icon color if needed
     style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Change selected text color here
   ),
 ),

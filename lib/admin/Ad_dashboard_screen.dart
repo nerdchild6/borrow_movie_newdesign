@@ -10,11 +10,11 @@ class AdDashboardScreen extends StatefulWidget {
 }
 
 class _AdDashboardScreenState extends State<AdDashboardScreen> {
-  int _availableCount = 5;
-  int _pendingCount = 4;
-  int _disableCount = 6;
-  int _borrowedCount = 6;
-  int _allMoviesCount = 21;
+  final int _availableCount = 5;
+  final int _pendingCount = 4;
+  final int _disableCount = 6;
+  final int _borrowedCount = 6;
+  final int _allMoviesCount = 21;
 
   void confirmLogout() {
     showDialog(
@@ -124,7 +124,7 @@ class _AdDashboardScreenState extends State<AdDashboardScreen> {
           Container(
             width: double.infinity,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/background.png'), // Path to your background image
                 fit: BoxFit.cover, // Ensures the image covers the entire area

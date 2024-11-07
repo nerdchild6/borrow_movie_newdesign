@@ -16,11 +16,11 @@ class _AppMainScreenState extends State<AppMainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    AppHomeScreen(),
-    AppBorrowScreen(),
-    AppDashboardScreen(),
-    AppRequestScreen(),
-    AppHistoryScreen(),
+    const AppHomeScreen(),
+    const AppBorrowScreen(),
+    const AppDashboardScreen(),
+    const AppRequestScreen(),
+    const AppHistoryScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -35,10 +35,10 @@ class _AppMainScreenState extends State<AppMainScreen> {
       body: _screens[_currentIndex], // Show the current screen
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Color.fromARGB(255, 161, 149, 127),
+        backgroundColor: const Color.fromARGB(255, 161, 149, 127),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart, size: 30), label: 'Borrow'),
           BottomNavigationBarItem(icon: Icon(Icons.dashboard, size: 30), label: 'Dashboard'),

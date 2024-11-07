@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -265,7 +267,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategoryItem(String genre, BuildContext context) {
-  // Find the first asset with a matching category.
   var matchingAsset = asset?.firstWhere(
     (item) => item['asset_name'] == genre,
     orElse: () => null,
@@ -273,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String filePath = matchingAsset != null
       ? 'assets/images/categories/${matchingAsset['asset_name']}.png'
-      : 'assets/images/categories/$genre.png'; // Default if not found
+      : 'assets/images/categories/$genre.png';
 
   return InkWell(
     onTap: () {
@@ -282,11 +283,10 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(
           builder: (context) => BorrowScreen(),
           settings: RouteSettings(
-  arguments: <String, dynamic>{
-    'categorie': matchingAsset?['asset_name'] ?? genre,
-  },
-),
-
+            arguments: <String, dynamic>{
+              'categorie': matchingAsset?['asset_name'] ?? genre,
+            },
+          ),
         ),
       );
     },
@@ -299,6 +299,9 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 80,
             height: 80,
             fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return const Icon(Icons.broken_image, size: 80); // Fallback icon
+            },
           ),
           const SizedBox(height: 8),
           Text(genre),
@@ -307,6 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   );
 }
+
 
 
   Widget _buildRecommendedItem(String imageName) {

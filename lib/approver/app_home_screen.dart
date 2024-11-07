@@ -183,10 +183,10 @@ class _AppHomeScreenState extends State<AppHomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AppBorrowScreen(),
+            builder: (context) => const AppBorrowScreen(),
             settings: RouteSettings(
               arguments: <String, dynamic>{
-                'categorie': '$genre',
+                'categorie': genre,
               },
             ),
           ),

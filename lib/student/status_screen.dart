@@ -4,6 +4,8 @@ import 'package:borrow_movie/student/main_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StatusScreen extends StatefulWidget {
+  const StatusScreen({super.key});
+
   @override
   State<StatusScreen> createState() => _StatusScreenState();
 }
@@ -137,7 +139,7 @@ class _StatusScreenState extends State<StatusScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 229, 229, 229), // Background color
+                        backgroundColor: const Color.fromARGB(255, 229, 229, 229), // Background color
                         foregroundColor: Colors.black, // Text color
                         padding: const EdgeInsets.symmetric(
                           vertical: 16.0, horizontal: 32.0), // Padding

@@ -5,6 +5,8 @@ import 'package:borrow_movie/student/status_screen.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -31,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
       body: _screens[_currentIndex], // Show the current screen
       bottomNavigationBar: BottomNavigationBar(
          type: BottomNavigationBarType.fixed,
-        backgroundColor: Color.fromARGB(255, 161, 149, 127),
+        backgroundColor: const Color.fromARGB(255, 161, 149, 127),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
        

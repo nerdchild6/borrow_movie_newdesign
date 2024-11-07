@@ -150,7 +150,7 @@ class _AppBorrowScreenState extends State<AppBorrowScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFE5DCC9),
+      backgroundColor: const Color(0xFFE5DCC9),
       appBar: AppBar(
         backgroundColor: const Color(0xFFD2C5B0),
         title: const Row(
@@ -174,11 +174,11 @@ class _AppBorrowScreenState extends State<AppBorrowScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search movie name',
-                  prefixIcon: Icon(Icons.search),
+                  prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -205,8 +205,8 @@ class _AppBorrowScreenState extends State<AppBorrowScreen> {
         category = newValue!;
       });
     },
-    dropdownColor: Color.fromARGB(255, 235, 234, 233), // Set your desired dropdown background color here
-    iconEnabledColor: Color.fromARGB(255, 0, 0, 0), // Change icon color if needed
+    dropdownColor: const Color.fromARGB(255, 235, 234, 233), // Set your desired dropdown background color here
+    iconEnabledColor: const Color.fromARGB(255, 0, 0, 0), // Change icon color if needed
     style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Change selected text color here
   ),
 ),

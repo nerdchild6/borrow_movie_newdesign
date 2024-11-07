@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdBorrowScreen extends StatefulWidget {
+  const AdBorrowScreen({super.key});
+
   @override
   State<AdBorrowScreen> createState() => _AdBorrowScreenState();
 }
@@ -446,8 +448,8 @@ class _AdBorrowScreenState extends State<AdBorrowScreen> {
         category = newValue!;
       });
     },
-    dropdownColor: Color.fromARGB(255, 235, 234, 233), // Set your desired dropdown background color here
-    iconEnabledColor: Color.fromARGB(255, 0, 0, 0), // Change icon color if needed
+    dropdownColor: const Color.fromARGB(255, 235, 234, 233), // Set your desired dropdown background color here
+    iconEnabledColor: const Color.fromARGB(255, 0, 0, 0), // Change icon color if needed
     style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)), // Change selected text color here
   ),
 ),

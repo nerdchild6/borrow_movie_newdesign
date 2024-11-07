@@ -10,6 +10,8 @@ import 'package:borrow_movie/student/status_screen.dart';
 import 'package:flutter/material.dart';
 
 class AdMainScreen extends StatefulWidget {
+  const AdMainScreen({super.key});
+
   @override
   _AdMainScreenState createState() => _AdMainScreenState();
 }
@@ -20,8 +22,8 @@ class _AdMainScreenState extends State<AdMainScreen> {
   final List<Widget> _screens = [
     AdHomeScreen(),
     AdBorrowScreen(),
-    AdDashboardScreen(),
-    AdReturnScreen(),
+    const AdDashboardScreen(),
+    const AdReturnScreen(),
     AdHistoryScreen(),
   ];
 
@@ -37,10 +39,10 @@ class _AdMainScreenState extends State<AdMainScreen> {
       body: _screens[_currentIndex], // Show the current screen
       bottomNavigationBar: BottomNavigationBar(
          type: BottomNavigationBarType.fixed,
-        backgroundColor: Color.fromARGB(255, 161, 149, 127),
+        backgroundColor: const Color.fromARGB(255, 161, 149, 127),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home, size: 30), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart, size: 30), label: 'Borrow'),
           BottomNavigationBarItem(icon: Icon(Icons.dashboard, size: 30), label: 'Dashboard'),

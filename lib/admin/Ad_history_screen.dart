@@ -4,6 +4,8 @@ import 'package:borrow_movie/login_student.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdHistoryScreen extends StatefulWidget {
+  const AdHistoryScreen({super.key});
+
   @override
   State<AdHistoryScreen> createState() => _AdHistoryScreenState();
 }

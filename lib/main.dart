@@ -12,13 +12,15 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Movie Rental App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Color(0xFFE5DCC9),
+        scaffoldBackgroundColor: const Color(0xFFE5DCC9),
       ),
       home: LoginScreen(), 
       debugShowCheckedModeBanner: false,// Set MainScreen as the home
