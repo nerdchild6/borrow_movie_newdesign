@@ -167,14 +167,39 @@ class _BorrowScreenState extends State<BorrowScreen> {
     );
   }
 
+  Widget _buildMovieGrid() {
+  if (isWaiting) {
+    return const Center(child: CircularProgressIndicator());
+  }
+  if (movies == null) {
+    return const Center(child: Text('No movies available'));
+  }
+
+  // Filter movies based on selected category
+  final filteredMovies = category == 'All' 
+    ? movies 
+    : movies!.where((movie) => movie['categorie'] == category).toList();
+
+  return GridView.builder(
+    padding: const EdgeInsets.all(8),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+      childAspectRatio: 0.7,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+    ),
+    itemCount: filteredMovies?.length ?? 0,
+    itemBuilder: (context, index) => _buildMovieCard(filteredMovies![index]),
+  );
+}
+
   Widget _buildMovieCard(Map<String, dynamic> movie) {
     final statusColor = {
-          'available': Colors.green,
-          'pending': Colors.orange,
-          'disabled': Colors.red,
-          'borrowed': Colors.grey
-        }[movie['asset_status']] ??
-        Colors.black;
+      'available': Colors.green,
+      'pending': Colors.orange,
+      'disabled': Colors.red,
+      'borrowed': Colors.grey,
+    }[movie['asset_status']] ?? Colors.black;
 
     return InkWell(
       onTap: () {
@@ -192,16 +217,18 @@ class _BorrowScreenState extends State<BorrowScreen> {
         }
       },
       child: Card(
+        elevation: 4,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              child: Image.asset(
-                'assets/images/movies/${movie['file_path']}',
-                fit: BoxFit.fill,
-                width: 135,
-                height: 117,
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(4),
+                child: Image.asset(
+                  'assets/images/movies/${movie['file_path']}',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             Padding(
@@ -211,27 +238,38 @@ class _BorrowScreenState extends State<BorrowScreen> {
                 children: [
                   Text(
                     movie['asset_name'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'movie ID: ${movie['asset_id']}',
+                    'ID: ${movie['asset_id']}',
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.green),
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: statusColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      movie['asset_status'],
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      movie['asset_status'].toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -281,10 +319,13 @@ class _BorrowScreenState extends State<BorrowScreen> {
           children: [
             Icon(Icons.shopping_cart, color: Colors.black),
             SizedBox(width: 8),
-            Text('BORROW',
-                style: TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold)),
-            Spacer(),
+            Text(
+              'BORROW',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -292,11 +333,12 @@ class _BorrowScreenState extends State<BorrowScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child:
-                Image.asset('assets/images/background.png', fit: BoxFit.cover),
+            child: Image.asset(
+              'assets/images/background.png',
+              fit: BoxFit.cover,
+            ),
           ),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -334,22 +376,7 @@ class _BorrowScreenState extends State<BorrowScreen> {
                   },
                 ),
               ),
-              Expanded(
-                child: isWaiting
-                    ? const Center(child: CircularProgressIndicator())
-                    : movies == null
-                        ? const Center(child: Text('No movies available'))
-                        : ListView.builder(
-                            itemCount: movies?.length ?? 0,
-                            itemBuilder: (context, index) {
-                              if (category != 'All' &&
-                                  movies![index]['categorie'] != category) {
-                                return const SizedBox.shrink();
-                              }
-                              return _buildMovieCard(movies![index]);
-                            },
-                          ),
-              ),
+              Expanded(child: _buildMovieGrid()),
             ],
           ),
         ],
