@@ -74,7 +74,11 @@ class _BorrowDetailsScreenState extends State<BorrowDetailsScreen> {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
+        if(response.body == 'can borrow only one movie per day'){
+          _showDialog('Can not borrow', response.body);
+        }else{
         _showDialog('Borrow Successful', response.body);
+        }
       } else {
         _showDialog('Error', 'Failed to borrow. Please try again.');
       }
