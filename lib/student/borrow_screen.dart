@@ -18,14 +18,21 @@ class BorrowScreen extends StatefulWidget {
 class _BorrowScreenState extends State<BorrowScreen> {
   final String url = '172.25.199.86:3000';
   bool isWaiting = false;
-  String username = '';
   List? movies;
-
   String? category = 'All';
   final List<String> categories = [
-    'Adventure', 'Action', 'Comedy', 'Fantasy', 
-    'Horror', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'All'
+    'Adventure',
+    'Action',
+    'Comedy',
+    'Fantasy',
+    'Horror',
+    'Romance',
+    'Sci-Fi',
+    'Thriller',
+    'War',
+    'All'
   ];
+  final TextEditingController search = TextEditingController();
 
   @override
   void initState() {
@@ -36,9 +43,12 @@ class _BorrowScreenState extends State<BorrowScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final data = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final data =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (data != null && data['categorie'] != null && category == 'All') {
-      category = data['categorie'];
+      setState(() {
+        category = data['categorie'];
+      });
     }
   }
 
@@ -55,7 +65,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
     try {
       final jwt = JWT.decode(token);
       Uri uri = Uri.http(url, '/all_asset');
-      final response = await http.get(uri, headers: {'authorization': token}).timeout(
+      final response =
+          await http.get(uri, headers: {'authorization': token}).timeout(
         const Duration(seconds: 10),
       );
 
@@ -90,7 +101,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
         title: Text(title),
         content: Text(message),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))
+          TextButton(
+              onPressed: () => Navigator.pop(context), child: const Text('OK'))
         ],
       ),
     );
@@ -102,7 +114,9 @@ class _BorrowScreenState extends State<BorrowScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Are you sure you want to logout?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel')),
           TextButton(onPressed: _logout, child: const Text('Yes')),
         ],
       ),
@@ -128,7 +142,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
               children: [
                 Icon(Icons.person, color: Colors.black),
                 SizedBox(width: 10),
-                Text('Header', style: TextStyle(color: Colors.black, fontSize: 24)),
+                Text('Header',
+                    style: TextStyle(color: Colors.black, fontSize: 24)),
               ],
             ),
           ),
@@ -141,7 +156,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
                 label: const Text('Logout'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                 ),
               ),
             ),
@@ -152,78 +168,109 @@ class _BorrowScreenState extends State<BorrowScreen> {
   }
 
   Widget _buildMovieCard(Map<String, dynamic> movie) {
-  final statusColor = {
-    'available': Colors.green,
-    'pending': Colors.orange,
-    'disabled': Colors.red,
-    'borrowed': Colors.grey
-  }[movie['asset_status']] ?? Colors.black;
+    final statusColor = {
+          'available': Colors.green,
+          'pending': Colors.orange,
+          'disabled': Colors.red,
+          'borrowed': Colors.grey
+        }[movie['asset_status']] ??
+        Colors.black;
 
-  return InkWell(
-    onTap: () {
-      if (movie['asset_status'] == 'available') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const BorrowDetailsScreen(),
-            settings: RouteSettings(arguments: {
-              'image': movie['file_path'],
-              'name': movie['asset_name'],
-            }),
-          ),
-        );
-      }
-    },
-    child: Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            child: Image.asset(
-              'assets/images/movies/${movie['file_path']}',
-              fit: BoxFit.fill,
-              width: 135,
-              height: 117,
+    return InkWell(
+      onTap: () {
+        if (movie['asset_status'] == 'available') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const BorrowDetailsScreen(),
+              settings: RouteSettings(arguments: {
+                'image': movie['file_path'],
+                'name': movie['asset_name'],
+              }),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  movie['asset_name'],
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'movie ID: ${movie['asset_id']}',  // Convert asset_id to string
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
-                ),
-                const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    movie['asset_status'],
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-              ],
+          );
+        }
+      },
+      child: Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              child: Image.asset(
+                'assets/images/movies/${movie['file_path']}',
+                fit: BoxFit.fill,
+                width: 135,
+                height: 117,
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    movie['asset_name'],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'movie ID: ${movie['asset_id']}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      movie['asset_status'],
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
+  void searchAsset() async {
+    setState(() {
+      isWaiting = true;
+    });
+    try {
+      Uri uri = Uri.http(url, '/asset', {'asset_name': search.text});
+      final response = await http.get(uri).timeout(
+            const Duration(seconds: 10),
+          );
+      if (response.statusCode == 200) {
+        setState(() {
+          movies = jsonDecode(response.body);
+        });
+      } else {
+        _showDialog('Error', response.body);
+      }
+    } on TimeoutException catch (e) {
+      debugPrint(e.message);
+      _showDialog('Error', 'Timeout error, try again!');
+    } catch (e) {
+      debugPrint(e.toString());
+      _showDialog('Error', 'Unknown error, try again!');
+    } finally {
+      setState(() {
+        isWaiting = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +281,9 @@ class _BorrowScreenState extends State<BorrowScreen> {
           children: [
             Icon(Icons.shopping_cart, color: Colors.black),
             SizedBox(width: 8),
-            Text('BORROW', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            Text('BORROW',
+                style: TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold)),
             Spacer(),
           ],
         ),
@@ -243,7 +292,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset('assets/images/background.png', fit: BoxFit.cover),
+            child:
+                Image.asset('assets/images/background.png', fit: BoxFit.cover),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,9 +301,13 @@ class _BorrowScreenState extends State<BorrowScreen> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextField(
+                  controller: search,
                   decoration: InputDecoration(
                     hintText: 'Search movie name',
-                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: IconButton(
+                      onPressed: searchAsset,
+                      icon: const Icon(Icons.search),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -269,31 +323,32 @@ class _BorrowScreenState extends State<BorrowScreen> {
                   items: categories.map((String cate) {
                     return DropdownMenuItem<String>(
                       value: cate,
-                      child: Text(cate, style: const TextStyle(color: Colors.black)),
+                      child: Text(cate),
                     );
                   }).toList(),
-                  onChanged: (String? newValue) => setState(() => category = newValue),
-                  dropdownColor: const Color(0xFFEBEAE9),
-                  iconEnabledColor: Colors.black,
-                  style: const TextStyle(color: Colors.black),
+                  onChanged: (String? newCategory) {
+                    setState(() {
+                      category = newCategory;
+                    });
+                    fetchMovies();
+                  },
                 ),
               ),
               Expanded(
-                child: movies != null
-                    ? GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.7,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
-                        itemCount: movies!.length,
-                        itemBuilder: (context, index) {
-                          return _buildMovieCard(movies![index]);
-                        },
-                      )
-                    : const Center(child: CircularProgressIndicator()),
+                child: isWaiting
+                    ? const Center(child: CircularProgressIndicator())
+                    : movies == null
+                        ? const Center(child: Text('No movies available'))
+                        : ListView.builder(
+                            itemCount: movies?.length ?? 0,
+                            itemBuilder: (context, index) {
+                              if (category != 'All' &&
+                                  movies![index]['categorie'] != category) {
+                                return const SizedBox.shrink();
+                              }
+                              return _buildMovieCard(movies![index]);
+                            },
+                          ),
               ),
             ],
           ),
