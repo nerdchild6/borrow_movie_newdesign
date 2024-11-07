@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // decode JWT to get uername and role
       final jwt = JWT.decode(token!);
       Map payload = jwt.payload;
-
+      
 
       // get expenses
       Uri uri = Uri.http(url, '/all_asset');
@@ -70,13 +70,14 @@ class _HomeScreenState extends State<HomeScreen> {
       // check server's response
       if (response.statusCode == 200) {
         // show expenses in ListView
+        
         setState(() {
           // update username
           // username = payload['username'];
           // convert response to List
           asset = jsonDecode(response.body);
     debugPrint('expense : $asset');
-
+debugPrint('payload : $payload');
         });
       } else {
         // wrong username or password
