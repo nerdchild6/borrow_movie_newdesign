@@ -86,6 +86,14 @@ class _BorrowScreenState extends State<BorrowScreen> {
     }
   }
 
+  void _navigateToLogin() {
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
+
   void _showDialog(String title, String message) {
     showDialog(
       context: context,
@@ -119,16 +127,6 @@ class _BorrowScreenState extends State<BorrowScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     _navigateToLogin();
-  }
-
-   void _navigateToLogin() {
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (route) => false,
-    );
-
   }
 
   Widget _buildDrawer() {
@@ -169,7 +167,7 @@ class _BorrowScreenState extends State<BorrowScreen> {
     );
   }
 
-  Widget _buildMovieGrid() {
+   Widget _buildMovieGrid() {
   if (isWaiting) {
     return const Center(child: CircularProgressIndicator());
   }
@@ -211,8 +209,7 @@ class _BorrowScreenState extends State<BorrowScreen> {
             MaterialPageRoute(
               builder: (context) => const BorrowDetailsScreen(),
               settings: RouteSettings(arguments: {
-                'image': movie['file_path'],
-                'name': movie['asset_name'],
+                'asset_id': movie['asset_id'],
               }),
             ),
           );
