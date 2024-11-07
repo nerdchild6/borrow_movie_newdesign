@@ -86,14 +86,6 @@ class _BorrowScreenState extends State<BorrowScreen> {
     }
   }
 
-  void _navigateToLogin() {
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  }
-
   void _showDialog(String title, String message) {
     showDialog(
       context: context,
@@ -127,6 +119,16 @@ class _BorrowScreenState extends State<BorrowScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     _navigateToLogin();
+  }
+
+   void _navigateToLogin() {
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
+    );
+
   }
 
   Widget _buildDrawer() {
