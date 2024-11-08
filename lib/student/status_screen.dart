@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
 import 'package:borrow_movie/login_student.dart';
 import 'package:borrow_movie/student/main_screen.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StatusScreen extends StatefulWidget {
@@ -11,17 +16,19 @@ class StatusScreen extends StatefulWidget {
 }
 
 class _StatusScreenState extends State<StatusScreen> {
+  final String url = '172.25.199.86:3000';
+  bool isWaiting = false;
+  List<dynamic>? request;
+  String? userId;
 
   void confirmLogout() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sure to logout?'),
+        title: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -33,62 +40,47 @@ class _StatusScreenState extends State<StatusScreen> {
     );
   }
 
-  void logout() async {
-    // remove stored token
+  Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    // await prefs.remove('token');
 
-
-    // to prevent warning of using context in async function
     if (!mounted) return;
-    // Cannot use only pushReplacement() because the dialog is showing
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
       (route) => false,
     );
   }
 
-  // Method to create a drawer
-  Widget createDrawer(BuildContext context) {
+  Widget buildDrawer(BuildContext context) {
     return Drawer(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-        height: 120, // Adjust the height to make it smaller
-        decoration: const BoxDecoration(color: Color(0xFFE5DCC9)),
-        padding: const EdgeInsets.all(8), // Add padding if needed
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Row(
-              children: [
+            height: 120,
+            decoration: const BoxDecoration(color: Color(0xFFE5DCC9)),
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: const [
                 Icon(Icons.person, color: Colors.black),
                 SizedBox(width: 10),
                 Text(
-                  'Header',
+                  'User Profile',
                   style: TextStyle(color: Colors.black, fontSize: 24),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: ElevatedButton.icon(
-                onPressed: confirmLogout,
-                icon: const Icon(Icons.logout, color: Colors.white),
-                label:
-                    const Text('Logout', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+            child: ElevatedButton.icon(
+              onPressed: confirmLogout,
+              icon: const Icon(Icons.logout, color: Colors.white),
+              label: const Text('Logout', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
             ),
@@ -98,11 +90,71 @@ class _StatusScreenState extends State<StatusScreen> {
     );
   }
 
+  void showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> fetchExpenses() async {
+    setState(() => isWaiting = true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) {
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+        return;
+      }
+
+      final jwt = JWT.decode(token);
+      userId = jwt.payload['user_id'].toString();
+
+      Uri uri = Uri.http(url, '/request/$userId');
+      http.Response response = await http.get(
+        uri,
+        headers: {'authorization': token},
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        setState(() => request = jsonDecode(response.body));
+        debugPrint('request : $request');
+      } else {
+        showErrorDialog('Error', response.body);
+      }
+    } on TimeoutException {
+      showErrorDialog('Error', 'Request timed out. Please try again.');
+    } catch (e) {
+      showErrorDialog('Error', 'An unknown error occurred.');
+    } finally {
+      setState(() => isWaiting = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchExpenses();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Retrieve the data from the route arguments
-    final data = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFD2C5B0),
@@ -110,12 +162,12 @@ class _StatusScreenState extends State<StatusScreen> {
           children: [
             Icon(Icons.check_circle_outline, color: Colors.black),
             SizedBox(width: 8),
-            Text('STATUS', style: TextStyle(color: Colors.black , fontWeight:FontWeight.bold)),
+            Text('STATUS', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ],
         ),
         automaticallyImplyLeading: false,
       ),
-      endDrawer: createDrawer(context),
+      endDrawer: buildDrawer(context),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -123,35 +175,31 @@ class _StatusScreenState extends State<StatusScreen> {
             fit: BoxFit.cover,
           ),
         ),
-        child: data != null && data.isNotEmpty
-            ? DefaultTabController(
-                length: 1, // Only one tab is being used
-                child: Column(
-                  children: [
-                    _buildStatusTab(data),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => MainScreen()),
-                          (Route<dynamic> route) => false, // Remove all previous routes
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 229, 229, 229), // Background color
-                        foregroundColor: Colors.black, // Text color
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 32.0), // Padding
-                        elevation: 5, // Elevation
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0), // Border radius
-                        ),
+        child: request != null && request!.isNotEmpty
+            ? Column(
+                children: [
+                  buildStatusCard(request![0]),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MainScreen()),
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 229, 229, 229),
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
                       ),
-                      child: const Text('Home'),
                     ),
-                  ],
-                ),
+                    child: const Text('Home'),
+                  ),
+                ],
               )
             : const Center(
                 child: Text('No data available.', style: TextStyle(fontSize: 18)),
@@ -160,7 +208,12 @@ class _StatusScreenState extends State<StatusScreen> {
     );
   }
 
-  Widget _buildStatusTab(Map<String, dynamic> data) {
+  Widget buildStatusCard(Map<String, dynamic> data) {
+    // Format dates
+  String formatDate(String dateStr) {
+    final date = DateTime.parse(dateStr);
+    return DateFormat('d/M/yyyy').format(date);
+  }
     return SingleChildScrollView(
       child: Center(
         child: Card(
@@ -171,19 +224,19 @@ class _StatusScreenState extends State<StatusScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Movie name: ${data['mo_name']}', style: const TextStyle(fontSize: 16)),
+                Text('Movie name: ${data['asset_name']}', style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
-                Text('Borrow date: ${data['borrow_date']}', style: const TextStyle(fontSize: 16)),
+                Text('Borrow date: ${formatDate(data['borrow_date'])}', style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
-                Text('Return date: ${data['return_date']}', style: const TextStyle(fontSize: 16)),
+                Text('Return date: ${formatDate(data['return_date'])}', style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
-                Text('Borrower name: ${data['bor_name']}', style: const TextStyle(fontSize: 16)),
+                Text('Borrower name: ${data['user_name']}', style: const TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     const Text('Status: ', style: TextStyle(fontSize: 16)),
                     Text(
-                      data['status'] ?? 'Pending',
+                      '${data['approve_status']}',
                       style: const TextStyle(fontSize: 16, color: Color.fromARGB(255, 186, 113, 11)),
                     ),
                   ],
