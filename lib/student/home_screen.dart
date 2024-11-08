@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
         
         setState(() {
           // update username
-          // username = payload['username'];
+          username = payload['username'];
           // convert response to List
           asset = jsonDecode(response.body);
     debugPrint('expense : $asset');
@@ -144,7 +144,7 @@ debugPrint('payload : $payload');
             height: 120, // Adjust the height to make it smaller
             decoration: const BoxDecoration(color: Color(0xFFE5DCC9)),
             padding: const EdgeInsets.all(8), // Add padding if needed
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Row(
@@ -152,7 +152,7 @@ debugPrint('payload : $payload');
                     Icon(Icons.person, color: Colors.black),
                     SizedBox(width: 10),
                     Text(
-                      'Header',
+                      username,
                       style: TextStyle(color: Colors.black, fontSize: 24),
                     ),
                   ],

@@ -20,6 +20,7 @@ class _StatusScreenState extends State<StatusScreen> {
   bool isWaiting = false;
   List<dynamic>? request;
   String? userId;
+  String username = '';
 
   void confirmLogout() {
     showDialog(
@@ -61,12 +62,12 @@ class _StatusScreenState extends State<StatusScreen> {
             decoration: const BoxDecoration(color: Color(0xFFE5DCC9)),
             padding: const EdgeInsets.all(8),
             child: Row(
-              children: const [
-                Icon(Icons.person, color: Colors.black),
-                SizedBox(width: 10),
+              children: [
+                const Icon(Icons.person, color: Colors.black),
+                const SizedBox(width: 10),
                 Text(
-                  'User Profile',
-                  style: TextStyle(color: Colors.black, fontSize: 24),
+                  username,
+                  style: const TextStyle(color: Colors.black, fontSize: 24),
                 ),
               ],
             ),
@@ -122,8 +123,10 @@ class _StatusScreenState extends State<StatusScreen> {
         return;
       }
 
+      // Decode JWT to get username and role
       final jwt = JWT.decode(token);
       userId = jwt.payload['user_id'].toString();
+      username = jwt.payload['username'] ?? '';
 
       Uri uri = Uri.http(url, '/request/$userId');
       http.Response response = await http.get(
@@ -132,8 +135,10 @@ class _StatusScreenState extends State<StatusScreen> {
       ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        setState(() => request = jsonDecode(response.body));
-        debugPrint('request : $request');
+        setState(() {
+          request = jsonDecode(response.body);
+        });
+        debugPrint('Request: $request');
       } else {
         showErrorDialog('Error', response.body);
       }
@@ -154,7 +159,6 @@ class _StatusScreenState extends State<StatusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFD2C5B0),
@@ -210,10 +214,11 @@ class _StatusScreenState extends State<StatusScreen> {
 
   Widget buildStatusCard(Map<String, dynamic> data) {
     // Format dates
-  String formatDate(String dateStr) {
-    final date = DateTime.parse(dateStr);
-    return DateFormat('d/M/yyyy').format(date);
-  }
+    String formatDate(String dateStr) {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('d/M/yyyy').format(date);
+    }
+
     return SingleChildScrollView(
       child: Center(
         child: Card(

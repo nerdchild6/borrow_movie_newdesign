@@ -18,6 +18,7 @@ class BorrowScreen extends StatefulWidget {
 class _BorrowScreenState extends State<BorrowScreen> {
   final String url = '172.25.199.86:3000';
   bool isWaiting = false;
+  String username = '';
   List? movies;
   String? category = 'All';
   final List<String> categories = [
@@ -55,15 +56,20 @@ class _BorrowScreenState extends State<BorrowScreen> {
   Future<void> fetchMovies() async {
     setState(() => isWaiting = true);
 
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     if (token == null) {
       _navigateToLogin();
       return;
     }
+    // token found
+      // decode JWT to get uername and role
+      final jwt = JWT.decode(token!);
+      Map payload = jwt.payload;
 
-    try {
-      final jwt = JWT.decode(token);
       Uri uri = Uri.http(url, '/all_asset');
       final response =
           await http.get(uri, headers: {'authorization': token}).timeout(
@@ -72,6 +78,8 @@ class _BorrowScreenState extends State<BorrowScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
+          // update username
+          username = payload['username'];
           movies = jsonDecode(response.body);
         });
       } else {
@@ -138,11 +146,11 @@ class _BorrowScreenState extends State<BorrowScreen> {
             height: 120,
             color: const Color(0xFFE5DCC9),
             padding: const EdgeInsets.all(8),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.person, color: Colors.black),
                 SizedBox(width: 10),
-                Text('Header',
+                Text(username,
                     style: TextStyle(color: Colors.black, fontSize: 24)),
               ],
             ),
@@ -153,7 +161,7 @@ class _BorrowScreenState extends State<BorrowScreen> {
               child: ElevatedButton.icon(
                 onPressed: _confirmLogout,
                 icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text('Logout'),
+                label: const Text('Logout', style: TextStyle(color: Colors.white),),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
