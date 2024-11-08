@@ -21,6 +21,7 @@ class _BorrowScreenState extends State<BorrowScreen> {
   String username = '';
   List? movies;
   String? category = 'All';
+  bool _isCategoryInitialized = false;
   final List<String> categories = [
     'Adventure',
     'Action',
@@ -44,29 +45,28 @@ class _BorrowScreenState extends State<BorrowScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final data =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    if (data != null && data['categorie'] != null && category == 'All') {
-      setState(() {
-        category = data['categorie'];
-      });
+    if (!_isCategoryInitialized) {
+      final data =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (data != null && data['categorie'] != null) {
+        setState(() {
+          category = data['categorie'];
+          _isCategoryInitialized = true; // Prevent further resets
+        });
+      }
     }
   }
 
   Future<void> fetchMovies() async {
     setState(() => isWaiting = true);
 
-    
-
     try {
       final prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
-    if (token == null) {
-      _navigateToLogin();
-      return;
-    }
-    // token found
-      // decode JWT to get uername and role
+      String? token = prefs.getString('token');
+      if (token == null) {
+        _navigateToLogin();
+        return;
+      }
       final jwt = JWT.decode(token!);
       Map payload = jwt.payload;
 
@@ -78,7 +78,6 @@ class _BorrowScreenState extends State<BorrowScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
-          // update username
           username = payload['username'];
           movies = jsonDecode(response.body);
         });
@@ -161,7 +160,10 @@ class _BorrowScreenState extends State<BorrowScreen> {
               child: ElevatedButton.icon(
                 onPressed: _confirmLogout,
                 icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text('Logout', style: TextStyle(color: Colors.white),),
+                label: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
@@ -175,39 +177,40 @@ class _BorrowScreenState extends State<BorrowScreen> {
     );
   }
 
-   Widget _buildMovieGrid() {
-  if (isWaiting) {
-    return const Center(child: CircularProgressIndicator());
-  }
-  if (movies == null) {
-    return const Center(child: Text('No movies available'));
-  }
+  Widget _buildMovieGrid() {
+    if (isWaiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (movies == null) {
+      return const Center(child: Text('No movies available'));
+    }
 
-  // Filter movies based on selected category
-  final filteredMovies = category == 'All' 
-    ? movies 
-    : movies!.where((movie) => movie['categorie'] == category).toList();
+    // Filter movies based on selected category
+    final filteredMovies = category == 'All'
+        ? movies
+        : movies!.where((movie) => movie['categorie'] == category).toList();
 
-  return GridView.builder(
-    padding: const EdgeInsets.all(8),
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      childAspectRatio: 0.7,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-    ),
-    itemCount: filteredMovies?.length ?? 0,
-    itemBuilder: (context, index) => _buildMovieCard(filteredMovies![index]),
-  );
-}
+    return GridView.builder(
+      padding: const EdgeInsets.all(8),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: filteredMovies?.length ?? 0,
+      itemBuilder: (context, index) => _buildMovieCard(filteredMovies![index]),
+    );
+  }
 
   Widget _buildMovieCard(Map<String, dynamic> movie) {
     final statusColor = {
-      'available': Colors.green,
-      'pending': Colors.orange,
-      'disabled': Colors.red,
-      'borrowed': Colors.grey,
-    }[movie['asset_status']] ?? Colors.black;
+          'available': Colors.green,
+          'pending': Colors.orange,
+          'disabled': Colors.red,
+          'borrowed': Colors.grey,
+        }[movie['asset_status']] ??
+        Colors.black;
 
     return InkWell(
       onTap: () {
@@ -379,7 +382,9 @@ class _BorrowScreenState extends State<BorrowScreen> {
                     setState(() {
                       category = newCategory;
                     });
-                    fetchMovies();
+                    if (newCategory == 'All') {
+                      fetchMovies();
+                    }
                   },
                 ),
               ),
