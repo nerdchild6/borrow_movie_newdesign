@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:borrow_movie/login_student.dart';
+import 'package:borrow_movie/student/status_screen.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,6 +80,8 @@ class _BorrowDetailsScreenState extends State<BorrowDetailsScreen> {
         }else{
         _showDialog('Borrow Successful', response.body);
         }
+        
+
       } else {
         _showDialog('Error', 'Failed to borrow. Please try again.');
       }
@@ -102,7 +105,14 @@ class _BorrowDetailsScreenState extends State<BorrowDetailsScreen> {
         content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => {
+              if(title == 'Borrow Successful'){
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const StatusScreen()),
+          )}else{Navigator.pop(context)}
+            },
             child: const Text('OK'),
           ),
         ],
@@ -217,7 +227,10 @@ class _BorrowDetailsScreenState extends State<BorrowDetailsScreen> {
                             child: const Text('Back', style: TextStyle(color: Colors.white)),
                           ),
                           ElevatedButton(
-                            onPressed: movies == null || isWaiting ? null : () => borrow(assetId),
+                            onPressed: movies == null || isWaiting ? null : () => {
+                              borrow(assetId)
+                              
+                              },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
                               minimumSize: const Size(120, 40),
